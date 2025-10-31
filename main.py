@@ -1,96 +1,19 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-from io import StringIO
 
 st.set_page_config(page_title="주민등록 인구 및 세대 현황", layout="wide")
 
-st.title("📈 주민등록 인구 및 세대 현황 (2025년 9월)")
-st.write("행정구역별 인구와 세대 현황 데이터를 Plotly로 시각화합니다.")
+st.title("📊 주민등록 인구 및 세대 현황 대시보드")
+st.write("""
+이 앱은 **행정안전부 주민등록 인구 및 세대 현황 (2025년 9월)** 데이터를 기반으로 작성되었습니다.  
+왼쪽 사이드바의 페이지 메뉴에서 원하는 시각화 항목을 선택해 보세요.
+""")
 
-uploaded_file = st.file_uploader("CSV 파일을 업로드하세요.", type=["csv"])
-
-if uploaded_file is not None:
-    try:
-        # 파일 내용이 비어있는지 확인
-        content = uploaded_file.read()
-        if not content.strip():
-            st.error("❌ 파일이 비어 있습니다. 올바른 CSV 파일을 업로드하세요.")
-        else:
-            # 다시 스트림으로 변환
-            uploaded_file.seek(0)
-
-            # 인코딩 자동 감지 시도
-            try:
-                df = pd.read_csv(uploaded_file, encoding="utf-8")
-            except UnicodeDecodeError:
-                uploaded_file.seek(0)
-                df = pd.read_csv(uploaded_file, encoding="euc-kr")
-
-            # 수치형 데이터 전처리
-            for col in df.columns:
-                if "인구수" in col or "세대수" in col:
-                    df[col] = (
-                        df[col]
-                        .astype(str)
-                        .str.replace(",", "")
-                        .str.replace("-", "0")
-                        .astype(float)
-                    )
-
-            # 행정구역명 정리
-            df["행정구역"] = df["행정구역"].str.replace(r"\(.*\)", "", regex=True).str.strip()
-
-            st.subheader("데이터 미리보기")
-            st.dataframe(df.head())
-
-            # --------------------
-            # 시각화 1: 지역별 총인구수
-            # --------------------
-            st.subheader("📍 행정구역별 총인구수 (상위 20개)")
-            fig_pop = px.bar(
-                df.sort_values(by=df.columns[1], ascending=False).head(20),
-                x="행정구역",
-                y=df.columns[1],
-                title="상위 20개 행정구역 총인구수",
-                color="행정구역"
-            )
-            st.plotly_chart(fig_pop, use_container_width=True)
-
-            # --------------------
-            # 시각화 2: 남녀 인구 비율 비교
-            # --------------------
-            st.subheader("👫 남녀 인구 비교")
-            gender_cols = [col for col in df.columns if "남자 인구수" in col or "여자 인구수" in col]
-            if len(gender_cols) == 2:
-                df_gender = df.melt(id_vars=["행정구역"], value_vars=gender_cols, var_name="성별", value_name="인구수")
-                fig_gender = px.bar(
-                    df_gender,
-                    x="행정구역",
-                    y="인구수",
-                    color="성별",
-                    title="행정구역별 남녀 인구 비교",
-                    barmode="group"
-                )
-                st.plotly_chart(fig_gender, use_container_width=True)
-
-            # --------------------
-            # 시각화 3: 총인구수 vs 세대수
-            # --------------------
-            st.subheader("🏠 총인구수 대비 세대수 관계")
-            fig_scatter = px.scatter(
-                df,
-                x=df.columns[2],  # 세대수
-                y=df.columns[1],  # 총인구수
-                hover_name="행정구역",
-                title="세대수와 총인구수의 상관관계"
-            )
-            st.plotly_chart(fig_scatter, use_container_width=True)
-
-    except Exception as e:
-        st.error(f"⚠️ 파일을 읽는 중 오류가 발생했습니다: {str(e)}")
-
-else:
-    st.info("좌측 상단에서 CSV 파일을 업로드해주세요.")
+st.markdown("---")
+st.subheader("📂 구성 안내")
+st.markdown("""
+1. **📍 총인구수 시각화** — 행정구역별 인구 분포를 막대그래프로 확인  
+2. **👫 남녀 인구 비교** — 성별 인구 비율을 비교  
+3. **🏠 세대수 대비 총인구수** — 두 지표 간의 상관관계를 시각화
+""")
 
 st.caption("데이터 출처: 행정안전부 주민등록 인구 및 세대 현황 (2025년 9월 기준)")
