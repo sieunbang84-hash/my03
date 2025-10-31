@@ -1,26 +1,6 @@
-📦 my-population-app/
-├── app.py                     ← 메인 홈 페이지
-├── pages/
-│   ├── 1_📍_총인구수_시각화.py
-│   ├── 2_👫_남녀_인구_비교.py
-│   └── 3_🏠_세대수_대비_총인구수.py
-└── requirements.txt
 import streamlit as st
 
-st.set_page_config(page_title="주민등록 인구 및 세대 현황", layout="wide")
+st.set_page_config(page_title="데이터 분석 앱", page_icon="📊")
 
-st.title("📊 주민등록 인구 및 세대 현황 대시보드")
-st.write("""
-이 앱은 **행정안전부 주민등록 인구 및 세대 현황 (2025년 9월)** 데이터를 기반으로 작성되었습니다.  
-왼쪽 사이드바의 페이지 메뉴에서 원하는 시각화 항목을 선택해 보세요.
-""")
-
-st.markdown("---")
-st.subheader("📂 구성 안내")
-st.markdown("""
-1. **📍 총인구수 시각화** — 행정구역별 인구 분포를 막대그래프로 확인  
-2. **👫 남녀 인구 비교** — 성별 인구 비율을 비교  
-3. **🏠 세대수 대비 총인구수** — 두 지표 간의 상관관계를 시각화
-""")
-
-st.caption("데이터 출처: 행정안전부 주민등록 인구 및 세대 현황 (2025년 9월 기준)")
+st.title("📊 데이터 분석 앱에 오신 걸 환영합니다!")
+st.write("왼쪽 메뉴에서 페이지를 선택하세요.")
